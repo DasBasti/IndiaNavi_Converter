@@ -27,15 +27,37 @@ def generate_eink():
 
     return p
 
+# 50/50 dot pattern
+def fiddyfiddy(x,y,colors):
+    if x%2:
+        if y%2:
+            return colors[0]
+        else:
+            return colors[1] 
+    else: 
+        if y%2:
+            return colors[1]
+    return colors[0]    
+
 def map_color(pxl, x, y):
+
+    #Format: (color in image), function to map to, [colors for function]
     palette=[
-             (0,0,0),
-             (255,255,255), 
-             (0,0,255), 
-             (255,0,0), 
-             (0,255,0),
-             (255,128,0),
-             (255,255,0)
+             [0,0,0],
+             [127,127,127,fiddyfiddy,[(0,0,0),(255,255,255)]],
+             [255,255,255], 
+             [0,0,255], 
+             [0,0,127,fiddyfiddy,[(0,0,0),(0,0,255)]], 
+             [255,0,0], 
+             [127,0,0,fiddyfiddy,[(0,0,0),(255,0,0)]], 
+             [0,255,0],
+             [0,127,0,fiddyfiddy,[(0,0,0),(0,255,0)]], 
+             [255,128,0],
+             [255,255,0],
+             [127,127,0,fiddyfiddy,[(0,0,0),(255,255,0)]], 
+             [0,255,255,fiddyfiddy,[(0,0,255),(0,255,0)]], 
+             [127,0,127,fiddyfiddy,[(255,0,0),(0,0,255)]],
+             [127,255,0,fiddyfiddy,[(255,0,0),(0,255,0)]],   
     ]
     
     deltac = 100000
@@ -45,5 +67,8 @@ def map_color(pxl, x, y):
         delta = sqrt(pow(color[0]-pxl[0],2)+pow(color[1]-pxl[1],2)+pow(color[2]-pxl[2],2))
         if delta < deltac:
             deltac = delta
-            new_pxl = color
+            if len(color)>3:
+                new_pxl = color[3](x, y, color[4])
+            else:
+                new_pxl = (color[0], color[1], color[2])
     return new_pxl
