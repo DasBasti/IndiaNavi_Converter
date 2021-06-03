@@ -28,7 +28,6 @@ def lat2tile(lat, zoom):
 
 
 def get_tiles(lon, lat, zoom):
-    global total
     jobs = []
     for z in zoom:
         jobs.extend(get_jobs_for(lon, lat, z))
@@ -47,18 +46,16 @@ def get_tiles(lon, lat, zoom):
 def process_image(job):
     os.makedirs(job.get("img_folder"), exist_ok=True)
     os.makedirs(job.get("job_folder"), exist_ok=True)
-    if not os.path.isfile((job.get("job_folder")+job.get("img_file")).split(".")[0]+".lz4"):
+    os.makedirs(job.get("lz4_folder"), exist_ok=True)
+    # load images from server if not in cache
+    url = "local"
+    if not os.path.isfile((job.get("img_folder")+job.get("img_file"))):
         urllib.request.urlretrieve(job.get("url"), job.get(
             "img_folder")+job.get("img_file"))
+        url = job.get("url")
     t = Image.open(job.get("img_folder")+job.get("img_file"))
     # use quantize functions instead of PIL quantize
-
-    # .quantize(palette=img_pal)
     out = t.convert("RGB").filter(ImageFilter.EDGE_ENHANCE)
-    #gray = ImageOps.equalize(t.convert("RGB"))
-    # gray.save(job.get("img_folder")+job.get("img_file").replace(".png","_gray.png"))
-    #image = gray.load()
-    #out = out.convert("RGB").filter(ImageFilter.EDGE_ENHANCE).filter(ImageFilter.SHARPEN).quantize(palette=eink_pal)
 
     out_pixel = out.load()
 
@@ -69,7 +66,8 @@ def process_image(job):
     out.save(job.get("img_folder") +
              job.get("img_file").replace(".png", "_dt.png"))
 
-    z = open((job.get("job_folder")+job.get("img_file")
+    # lz4 compress raw image
+    z = open((job.get("lz4_folder")+job.get("img_file")
               ).split(".")[0]+".lz4", "w+b")
     z.write(lz4.frame.compress(bytearray(epd.getbuffer(out))))
     z.close()
@@ -78,7 +76,7 @@ def process_image(job):
               ).split(".")[0]+".raw", "w+b")
     r.write(bytearray(epd.getbuffer(out)))
     r.close()
-    return("{0} -> {1}".format(job.get("url"), job.get("img_folder")+job.get("img_file")))
+    return("{0} -> {1}".format(url, job.get("img_folder")+job.get("img_file")))
 
 
 def get_jobs_for(lon, lat, zoom):
@@ -112,8 +110,9 @@ def get_jobs_for(lon, lat, zoom):
             url = url_template.format(z=zoom, x=x[0]+dx, y=y[0]+dy)
             img_folder = "tiles/png/{z}/{x}/".format(z=zoom, x=x[0]+dx)
             job_folder = "tiles/raw/{z}/{x}/".format(z=zoom, x=x[0]+dx)
+            lz4_folder = "tiles/lz4/{z}/{x}/".format(z=zoom, x=x[0]+dx)
             img_file = "{y}.png".format(z=zoom, x=x[0]+dx, y=y[0]+dy)
-            jobs.append({"url": url, "job_folder": job_folder,
+            jobs.append({"url": url, "lz4_folder": lz4_folder, "job_folder": job_folder,
                         "img_folder": img_folder, "img_file": img_file})
     print('Jobs: {0}'.format(len(jobs)))
     return jobs
