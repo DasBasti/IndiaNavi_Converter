@@ -1,0 +1,64 @@
+name: Generate IndiaNavi Tiles for SD card 
+on:
+  push:
+    branches: 
+      - '*'
+  pull_request:
+
+jobs:
+  install_pip_and_generate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Set up Python
+      uses: actions/setup-python@v2.2.1
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt         
+    
+    - name: Run splash converter
+      run: python gen_splash.py 
+
+    - name: Run tile converter
+      run: python sq_loader.py
+
+    - name: zip tiles
+      run: |
+        cd tiles/raw && zip -r raw.zip . && cd ../..
+        cd tiles/lz4 && zip -r lz4.zip . && cd ../..
+        cd tiles/png && zip -r png.zip . && cd ../..
+
+    - name: Upload raw zip file
+      if: success()
+      uses: actions/upload-artifact@v2
+      with:
+        name: raw.zip
+        path: tiles/raw/raw.zip
+        retention-days: 5   
+        
+    - name: Upload lz4 zip file
+      if: success()
+      uses: actions/upload-artifact@v2
+      with:
+        name: lz4.zip
+        path: tiles/lz4/lz4.zip
+        retention-days: 5   
+    
+    - name: Upload png zip file
+      if: success()
+      uses: actions/upload-artifact@v2
+      with:
+        name: png.zip
+        path: tiles/png/png.zip
+        retention-days: 5   
+    
