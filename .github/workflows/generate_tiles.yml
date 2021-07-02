@@ -34,17 +34,16 @@ jobs:
 
     - name: zip tiles
       run: |
-        cd tiles/raw && zip -r raw.zip . && cd ../..
-        cd tiles/lz4 && zip -r lz4.zip . && cd ../..
-        cd tiles/png && zip -r png.zip . && cd ../..
+        cd tiles/lz4 && zip -r lz4.zip . && cd .. && rm -rf lz4 && cd ..
+        cd tiles/png && zip -r png.zip . && cd .. && rm -rf png && cd ..
+        cd tiles && mv raw MAPS && cp ../SD_CARD/* . && zip -r indianavi_sd.zip .  && cd ..
 
-    - name: Upload raw zip file
+    - name: Upload sd card zip file
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: raw.zip
-        path: tiles/raw/raw.zip
-        retention-days: 5   
+        name: indianavi_sd.zip
+        path: tiles/indianvi_sd.zip
         
     - name: Upload lz4 zip file
       if: success()
