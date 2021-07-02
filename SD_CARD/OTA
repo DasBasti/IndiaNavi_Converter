@@ -1,0 +1,7 @@
+http://d14kkt1uzwasu0.cloudfront.net/firmware_latest.bin
+http://laptop.local:8070/firmware.bin
+
+
+First line is github action build release version from main branch
+Second line is local build for debugging.
+Change order to change Source
