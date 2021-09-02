@@ -3,7 +3,8 @@ import gpxpy
 import gpxpy.gpx
 import math
 
-url_template = "https://platinenmacher.tech/navi/tiles/{z}/{x}/{y}.png"
+url_base = "https://platinenmacher.tech/navi/api"
+url_template = "/tile/{z}/{x}/{y}.raw"
 
 
 def lon2tile(lon, zoom):
@@ -39,7 +40,7 @@ def get_jobs_for(lon, lat, zoom):
     jobs = []
     for dx in range(abs(x[1]-x[0])):
         for dy in range(abs(y[1]-y[0])):
-            url = url_template.format(z=zoom, x=x[0]+dx, y=y[0]+dy)
+            url = url_base + url_template.format(z=zoom, x=x[0]+dx, y=y[0]+dy)
             jobs.append(url)
     return jobs
 
