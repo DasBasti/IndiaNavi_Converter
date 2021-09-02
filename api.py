@@ -1,5 +1,4 @@
 import gpx_converter
-from os import path
 from flask import Flask, jsonify, flash, request, redirect, make_response, url_for
 from werkzeug.utils import secure_filename
 import hashlib
@@ -9,6 +8,7 @@ from PIL import Image, ImageFilter
 from io import BytesIO
 import pal
 import epd5in65f
+from threading import Thread
 
 UPLOAD_FOLDER = './gpx'
 ALLOWED_EXTENSIONS = {'gpx'}
@@ -17,6 +17,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['APPLICATION_ROOT'] = "/navi/api"
 
+jobs = {}
 
 epd = epd5in65f.EPD()
 
@@ -33,11 +34,11 @@ def allowed_file(filename):
 @app.route('/gpx', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        gpx_converter.url_base = url_for('index')
+        gpx_converter.url_base = "http://127.0.0.1:5000"
         # check if the post request has the file part
         device_hash = hashlib.sha1(
             request.form['device-id'].encode()).hexdigest()
-        print(device_hash)
+        print("Generate job", device_hash)
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
@@ -49,10 +50,15 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            data = json.dumps(gpx_converter.convert(filename, file))
-            with open(app.config['UPLOAD_FOLDER']+"/"+device_hash+".track", "w") as f:
-                f.write(data)
-            return device_hash
+            result = gpx_converter.convert(filename, file)
+            result['status'] = False
+            result['id'] = device_hash
+            jobs[device_hash] = result
+            thread = Thread(target=run_download_task, args=(device_hash,))
+            thread.daemon = True
+            thread.start()
+            return result
+
     return '''
     <!doctype html>
     <title>Upload new File</title>
@@ -94,6 +100,10 @@ def convert_tile(z,x,y,ext):
             'Content-Disposition', 'attachment', filename="{}.raw".format(y))
         return response
 
+@app.route('/status/<id>')
+def get_status(id):
+    return jsonify({"status": jobs[id]['status']})
+
 """
     out.save(job.get("img_folder") +
              job.get("img_file").replace(".png", "_dt.png"))
@@ -112,6 +122,24 @@ def convert_tile(z,x,y,ext):
 
 """
 
+from os import makedirs, getcwd, path
+import urllib.request
+import shutil
+def run_download_task(id):
+    job = jobs[id]
+    print("Starte job", id)
+    for u in job['urls']:
+        tile_path = "gpx/"+id+"/MAPS/"+u['name']
+        makedirs(path.dirname(tile_path), exist_ok=True)
+        urllib.request.urlretrieve(u['uri'], tile_path)
+        break
+    tf = getcwd()+"/gpx/"+id
+    makedirs("gpx/"+id, exist_ok=True)
+    with open(tf+"/TRACK", 'w') as t:
+        for wp in job['wps']:
+            t.write("{} {}\n".format(wp['lon'], wp['lat']))
+    shutil.make_archive("static/"+id, "zip", "gpx/"+id)
+    job['status'] = True
 
 if __name__ == "__main__":
-    app.run(debug = True)
+    app.run(debug = True, threaded=True)

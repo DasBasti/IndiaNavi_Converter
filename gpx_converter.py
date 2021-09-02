@@ -41,7 +41,7 @@ def get_jobs_for(lon, lat, zoom):
     for dx in range(abs(x[1]-x[0])):
         for dy in range(abs(y[1]-y[0])):
             url = url_base + url_template.format(z=zoom, x=x[0]+dx, y=y[0]+dy)
-            jobs.append(url)
+            jobs.append({'uri':url,'name':"{z}/{x}/{y}.raw".format(z=zoom, x=x[0]+dx, y=y[0]+dy)})
     return jobs
 
 
