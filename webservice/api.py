@@ -35,18 +35,22 @@ def upload_file():
     if request.method == 'POST':
         gpx_converter.url_base = "http://127.0.0.1:5000"
         # check if the post request has the file part
+        if 'device-id' not in request.form:
+            return jsonify(error="no device-id field")
+        
         device_hash = hashlib.sha1(
             request.form['device-id'].encode()).hexdigest()
+        
         print("Generate job", device_hash)
+        
         if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
+            return jsonify(error="No file part")
         file = request.files['file']
+        
         # if user does not select file, browser also
         # submit an empty part without filename
         if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
+            return jsonify(error="No filename")
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             result = gpx_converter.convert(filename, file)
