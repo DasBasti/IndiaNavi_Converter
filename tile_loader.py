@@ -1,10 +1,9 @@
-from os import write
 import gpxpy
 import gpxpy.gpx
-import download
+from webservice import download
 import sys
 
-zoom=16
+zoom=[14,16]
 gpx_data = open(sys.argv[1], 'r')
 jobfolder = sys.argv[1].rsplit(".")[0]
 
@@ -26,4 +25,4 @@ for track in gpx.tracks:
 
             
 print('Box at ({0},{1}) -> ({2},{3})'.format(lat[0], lon[0], lat[1], lon[1]))
-download.get_map(lon, lat, [16,13], jobfolder)
+download.get_map(lon, lat, zoom, jobfolder)

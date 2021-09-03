@@ -1,5 +1,4 @@
-import download
-import sys
+from webservice import download
 
 zoom = 16
 

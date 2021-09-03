@@ -1,7 +1,7 @@
 import os
 from PIL import Image, ImageFilter
-import pal
-import epd5in65f
+from webservice import pal
+from webservice import epd5in65f
 #import lz4.frame
 
 
