@@ -32,8 +32,9 @@ def allowed_file(filename):
 
 @app.route('/gpx', methods=['GET', 'POST'])
 def upload_file():
+    global jobs
     if request.method == 'POST':
-        gpx_converter.url_base = "http://127.0.0.1:5000"
+        gpx_converter.url_base = "https://platinenmacher.tech/indianavi"
         # check if the post request has the file part
         if 'device-id' not in request.form:
             return jsonify(error="no device-id field")
@@ -105,7 +106,12 @@ def convert_tile(z,x,y,ext):
 
 @app.route('/status/<id>')
 def get_status(id):
-    return jsonify({"status": jobs[id]['status'], "url": url_for('static', filename=id+".zip")})
+    global jobs
+    job = jobs.get(id)
+    if job:
+        return jsonify({"status": jobs[id]['status'], "url": url_for('static', filename=id+".zip")})
+    else:
+        return jsonify(error="Can not find job "+id)
 
 """
     out.save(job.get("img_folder") +
@@ -129,6 +135,7 @@ from os import makedirs, getcwd, path
 import urllib.request
 import shutil
 def run_download_task(id):
+    global jobs
     job = jobs[id]
     print("Starte job", id)
     for u in job['urls']:
