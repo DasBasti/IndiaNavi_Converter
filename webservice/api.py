@@ -10,6 +10,7 @@ import epd5in65f
 from threading import Thread
 import redis
 import json
+from os import path
 r = redis.Redis('localhost')
 
 UPLOAD_FOLDER = './gpx'
@@ -83,19 +84,28 @@ def upload_file():
 
 @app.route('/tile/<z>/<x>/<y>.<ext>', methods=['GET'])
 def convert_tile(z,x,y,ext):
-    url = "https://platinenmacher.tech/navi/tiles/{z}/{x}/{y}.png".format(z=z, x=x, y=y)
-    print("GET:", url)
-    req = requests.get(url)
-    if req.status_code != 200:
-        return jsonify(error="error while downloading")
-    t = Image.open(BytesIO(req.content))
-    out = t.convert("RGB").filter(ImageFilter.EDGE_ENHANCE)
+    tile_file = "tiles/{z}_{x}_{y}.png".format(z=z, x=x, y=y)
+    print("get file:", tile_file)
+    if path.exists(tile_file):
+        print("cache hit")
+        out = Image.open(tile_file)
+    else:
+        print("cache miss")
+        url = "https://platinenmacher.tech/navi/tiles/{z}/{x}/{y}.png".format(z=z, x=x, y=y)
+        print("GET:", url)
+        req = requests.get(url)
+        if req.status_code != 200:
+            return jsonify(error="error while downloading")
+        t = Image.open(BytesIO(req.content))
+        out = t.convert("RGB").filter(ImageFilter.EDGE_ENHANCE)
 
-    out_pixel = out.load()
+        out_pixel = out.load()
 
-    for px in range(t.size[0]):
-        for py in range(t.size[1]):
-            out_pixel[px, py] = pal.map_color(out_pixel[px, py], px, py)
+        for px in range(t.size[0]):
+            for py in range(t.size[1]):
+                out_pixel[px, py] = pal.map_color(out_pixel[px, py], px, py)
+        
+        out.save(tile_file)
 
     print("Response for", ext)
     if ext == 'png':
