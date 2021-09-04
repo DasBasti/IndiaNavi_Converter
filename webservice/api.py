@@ -63,6 +63,8 @@ def upload_file():
             resstr = json.dumps(result)
             print(type(resstr))
             r.hset(device_hash, "data", resstr)
+            r.hset(device_hash, "files", len(result['urls']))
+            r.hset(device_hash, "done", 0)
             thread = Thread(target=run_download_task, args=(device_hash,))
             thread.daemon = True
             thread.start()
@@ -112,8 +114,10 @@ def convert_tile(z,x,y,ext):
 @app.route('/status/<id>')
 def get_status(id):
     job = json.loads(r.hget(id, "data"))
+    files = int(r.hget(id, "files"))
+    files_done = int(r.hget(id, "done"))
     if job:
-        return jsonify({"status": job['status'], "url": "https://platinenmacher.tech/indianavi"+url_for('static', filename=id+".zip")})
+        return jsonify({"status": job['status'], "files": files, "done": files_done, "url": "https://platinenmacher.tech/indianavi"+url_for('static', filename=id+".zip")})
     else:
         return jsonify(error="Can not find job "+id)
 
@@ -145,6 +149,7 @@ def run_download_task(id):
         tile_path = "gpx/"+id+"/MAPS/"+u['name']
         makedirs(path.dirname(tile_path), exist_ok=True)
         urllib.request.urlretrieve(u['uri'], tile_path)
+        r.hincrby(id, "done", 1)
     tf = getcwd()+"/gpx/"+id
     makedirs("gpx/"+id, exist_ok=True)
     with open(tf+"/TRACK", 'w') as t:
