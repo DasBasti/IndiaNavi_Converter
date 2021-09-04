@@ -157,7 +157,7 @@ def run_download_task(id):
     tf = getcwd()+"/gpx/"+id
     makedirs("gpx/"+id, exist_ok=True)
     with open(tf+"/TRACK", 'w') as t:
-        for wp in job[b'wps']:
+        for wp in job['wps']:
             t.write("{} {}\n".format(wp['lon'], wp['lat']))
     shutil.make_archive("static/"+id, "zip", "gpx/"+id)
     job['status'] = "true"
