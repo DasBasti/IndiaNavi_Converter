@@ -129,7 +129,7 @@ def get_status(id):
     files = int(r.hget(id, "files"))
     files_done = int(r.hget(id, "done"))
     if job:
-        return jsonify({"status": job['status'], "files": files, "done": files_done, "url": "https://platinenmacher.tech/indianavi"+url_for('static', filename=id+".zip")})
+        return jsonify({"status": job['status'], "files": files, "done": files_done, "url": "https://platinenmacher.tech"+url_for('static', filename=id+".zip")})
     else:
         return jsonify(error="Can not find job "+id)
 
@@ -171,7 +171,7 @@ def run_download_task(id):
             t.write("{} {}\n".format(wp['lon'], wp['lat']))
     shutil.make_archive("static/"+id, "zip", "gpx/"+id)
     job['status'] = "true"
-    r.hset(id, "status", "true")
+    r.hset(id, "data", json.dumps(job))
 
 if __name__ == "__main__":
     app.run(debug = True, threaded=True)
