@@ -145,8 +145,8 @@ from os import makedirs, getcwd, path
 import urllib.request
 import shutil
 import socket
+socket.setdefaulttimeout(300)
 def run_download_task(id):
-    socket.setdefaulttimeout(time=300)
     job = json.loads(r.hget(id, "data"))
     print("Starte job", id)
     for u in job['urls']:
