@@ -171,7 +171,7 @@ def run_download_task(id):
             t.write("{} {}\n".format(wp['lon'], wp['lat']))
     shutil.make_archive("static/"+id, "zip", "gpx/"+id)
     job['status'] = "true"
-    r.hset(job)
+    r.hset(id, "status", "true")
 
 if __name__ == "__main__":
     app.run(debug = True, threaded=True)
