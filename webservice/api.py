@@ -8,6 +8,9 @@ from io import BytesIO
 import pal
 import epd5in65f
 from threading import Thread
+import redis
+import json
+r = redis.Redis('localhost')
 
 UPLOAD_FOLDER = './gpx'
 ALLOWED_EXTENSIONS = {'gpx'}
@@ -16,7 +19,6 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['APPLICATION_ROOT'] = "/navi/api"
 
-jobs = {}
 
 epd = epd5in65f.EPD()
 
@@ -32,7 +34,6 @@ def allowed_file(filename):
 
 @app.route('/gpx', methods=['GET', 'POST'])
 def upload_file():
-    global jobs
     if request.method == 'POST':
         gpx_converter.url_base = "https://platinenmacher.tech/indianavi"
         # check if the post request has the file part
@@ -55,13 +56,17 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             result = gpx_converter.convert(filename, file)
-            result['status'] = False
+            result['status'] = "false"
             result['id'] = device_hash
-            jobs[device_hash] = result
+            #result['urls'] = json.dumps(result['urls'])
+            #result['wps'] = json.dumps(result['wps'])
+            resstr = json.dumps(result)
+            print(type(resstr))
+            r.hset(device_hash, "data", resstr)
             thread = Thread(target=run_download_task, args=(device_hash,))
             thread.daemon = True
             thread.start()
-            return result
+            return redirect(url_for('get_status', id=device_hash))
 
     return '''
     <!doctype html>
@@ -106,10 +111,9 @@ def convert_tile(z,x,y,ext):
 
 @app.route('/status/<id>')
 def get_status(id):
-    global jobs
-    job = jobs.get(id)
+    job = json.loads(r.hget(id, "data"))
     if job:
-        return jsonify({"status": jobs[id]['status'], "url": url_for('static', filename=id+".zip")})
+        return jsonify({"status": job['status'], "url": "https://platinenmacher.tech/indianavi"+url_for('static', filename=id+".zip")})
     else:
         return jsonify(error="Can not find job "+id)
 
@@ -135,8 +139,7 @@ from os import makedirs, getcwd, path
 import urllib.request
 import shutil
 def run_download_task(id):
-    global jobs
-    job = jobs[id]
+    job = json.loads(r.hget(id, "data"))
     print("Starte job", id)
     for u in job['urls']:
         tile_path = "gpx/"+id+"/MAPS/"+u['name']
@@ -145,10 +148,11 @@ def run_download_task(id):
     tf = getcwd()+"/gpx/"+id
     makedirs("gpx/"+id, exist_ok=True)
     with open(tf+"/TRACK", 'w') as t:
-        for wp in job['wps']:
+        for wp in job[b'wps']:
             t.write("{} {}\n".format(wp['lon'], wp['lat']))
     shutil.make_archive("static/"+id, "zip", "gpx/"+id)
-    job['status'] = True
+    job['status'] = "true"
+    r.hset(job)
 
 if __name__ == "__main__":
     app.run(debug = True, threaded=True)
