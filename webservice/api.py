@@ -86,6 +86,8 @@ def convert_tile(z,x,y,ext):
     url = "https://platinenmacher.tech/navi/tiles/{z}/{x}/{y}.png".format(z=z, x=x, y=y)
     print("GET:", url)
     req = requests.get(url)
+    if req.status_code != 200:
+        return jsonify(error="error while downloading")
     t = Image.open(BytesIO(req.content))
     out = t.convert("RGB").filter(ImageFilter.EDGE_ENHANCE)
 
@@ -142,7 +144,9 @@ def get_status(id):
 from os import makedirs, getcwd, path
 import urllib.request
 import shutil
+import socket
 def run_download_task(id):
+    socket.setdefaulttimeout(time=300)
     job = json.loads(r.hget(id, "data"))
     print("Starte job", id)
     for u in job['urls']:
