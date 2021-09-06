@@ -129,7 +129,7 @@ def get_status(id):
     files = int(r.hget(id, "files"))
     files_done = int(r.hget(id, "done"))
     if job:
-        return jsonify({"status": job['status'], "files": files, "done": files_done, "url": "https://platinenmacher.tech"+url_for('static', filename=id+".zip")})
+        return jsonify({"id":id, "status": job['status'], "files": files, "done": files_done, "url": "https://platinenmacher.tech"+url_for('static', filename=id+".zip")})
     else:
         return jsonify(error="Can not find job "+id)
 
