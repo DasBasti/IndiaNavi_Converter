@@ -86,29 +86,25 @@ def get_jobs_for(lon, lat, zoom):
     # generate tile limits for download
     x = [lon2tile(lon[0], zoom), lon2tile(lon[1], zoom)]
     y = [lat2tile(lat[0], zoom), lat2tile(lat[1], zoom)]
-
+    print('Box at ({0},{1}) -> ({2},{3})'.format(lat[0], lon[0], lat[1], lon[1]))
     # switch if reversed
     if y[0] > y[1]:
-        a = y[0]
-        y[1] = y[0]
-        y[0] = a
+        y[1],y[0] = y[0],y[1]
 
     if x[0] > x[1]:
-        a = x[0]
-        x[1] = x[0]
-        x[0] = a
+        x[1],x[0] = x[0],x[1]
 
     # add tiles to the limits
-    x[1] += 10
-    x[0] -= 10
-    y[1] += 10
-    y[0] -= 10
+    x[1] += 5
+    x[0] -= 5
+    y[1] += 5
+    y[0] -= 5
 
     print(
         'Tiles: ({4}/{0}/{1}.png) -> ({4}/{2}/{3}.png)'.format(x[0], y[0], x[1], y[1], zoom))
     jobs = []
-    for dx in range(abs(x[1]-x[0])):
-        for dy in range(abs(y[1]-y[0])):
+    for dx in range(abs(x[1]-x[0])+1):
+        for dy in range(abs(y[1]-y[0])+1):
             url = url_template.format(z=zoom, x=x[0]+dx, y=y[0]+dy)
             img_folder = "tiles/png/{z}/{x}/".format(z=zoom, x=x[0]+dx)
             job_folder = "tiles/raw/{z}/{x}/".format(z=zoom, x=x[0]+dx)
