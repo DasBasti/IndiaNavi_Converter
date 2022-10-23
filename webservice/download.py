@@ -2,13 +2,13 @@ import os
 import math
 import urllib.request
 from PIL import Image, ImageFilter, ImageOps
-import pal
-import epd5in65f
+from . import pal
+from . import epd5in65f
 import lz4.frame
 from multiprocessing import Pool
 
 
-url_template = "https://platinenmacher.tech/navi/tiles/{z}/{x}/{y}.png"
+url_template = "https://c.tile.openstreetmap.de/{z}/{x}/{y}.png"
 epd = epd5in65f.EPD()
 eink_pal = Image.new("P", (1, 1), 0)
 eink_pal.putpalette(pal.generate_eink())
@@ -57,7 +57,7 @@ def process_image(job):
         url = job.get("url")
     t = Image.open(job.get("img_folder")+job.get("img_file"))
     # use quantize functions instead of PIL quantize
-    out = t.convert("RGB").filter(ImageFilter.EDGE_ENHANCE)
+    out = t.convert("RGB").filter(ImageFilter.EDGE_ENHANCE_MORE)
 
     out_pixel = out.load()
 
@@ -65,8 +65,8 @@ def process_image(job):
         for py in range(t.size[1]):
             out_pixel[px, py] = pal.map_color(out_pixel[px, py], px, py)
 
-    #out.save(job.get("img_folder") +
-    #         job.get("img_file").replace(".png", "_dt.png"))
+    out.save(job.get("img_folder") +
+             job.get("img_file").replace(".png", "_dt.png"))
 
     # lz4 compress raw image
     #z = open((job.get("lz4_folder")+job.get("img_file")
