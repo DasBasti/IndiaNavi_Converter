@@ -38,6 +38,18 @@ jobs:
         cd tiles/png && zip -r png.zip . && cd .. && rm -rf png && cd ..
         cd tiles && mv raw MAPS && cp ../SD_CARD/* . && zip -r indianavi_sd.zip .  && cd ..
 
+    - name: Make screenshot
+      run: |
+        cd tiles
+        ../simulator --screenshot
+
+    - name: Upload screenshot file
+      if: success()
+      uses: actions/upload-artifact@v2
+      with:
+        name: screenshot.pnm
+        path: tiles/frame.pnm
+
     - name: Upload sd card zip file
       if: success()
       uses: actions/upload-artifact@v2
