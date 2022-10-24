@@ -34,6 +34,7 @@ jobs:
       run: |
         sudo apt update 
         sudo apt install xvfb -y
+        sudo apt install imagemagick -y
 
     - name: Install dependencies
       run: |
@@ -48,16 +49,16 @@ jobs:
 
     - name: Take screenshot
       run: |
-          chmod +x ./indianavi &
+          chmod +x ./indianavi
           xvfb-run ./indianavi --screenshot
+          convert frame.pnm frame.png
 
     - name: Upload screenshot
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        name: screenshot.pnm
-        path: frame.pnm
-
+        name: screenshot.png
+        path: frame.png
 
     - name: zip tiles
       run: |
