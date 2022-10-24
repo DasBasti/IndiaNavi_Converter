@@ -1,5 +1,13 @@
 from math import sqrt, pow
 
+BLACK = (0,0,0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+ORANGE = (255, 128, 0)
+YELLOW = (255, 255, 0)
+
 
 def generate_tiles():
     values = [0x00, 0x1f, 0x3f, 0x7f, 0xbf, 0xff]
@@ -55,43 +63,43 @@ def threefourth(x, y, colors):
 # Format: (color in image), function to map to, [colors for function]
 palette = [
     [0, 0, 0],
-    [127, 127, 127, fiddyfiddy, [(0, 0, 0), (255, 255, 255)]],
+    [127, 127, 127, fiddyfiddy, [BLACK, WHITE]],
     [255, 255, 255],
     [0, 0, 255],
-    [0, 0, 127, fiddyfiddy, [(0, 0, 0), (0, 0, 255)]],
+    [0, 0, 127, fiddyfiddy, [BLACK, BLUE]],
     [255, 0, 0],
-    [127, 0, 0, fiddyfiddy, [(0, 0, 0), (255, 0, 0)]],
+    [127, 0, 0, fiddyfiddy, [BLACK, RED]],
     [0, 255, 0],
-    [0, 127, 0, fiddyfiddy, [(0, 0, 0), (0, 255, 0)]],
+    [0, 127, 0, fiddyfiddy, [BLACK, GREEN]],
     [255, 128, 0],
     [255, 255, 0],
-    [127, 127, 0, fiddyfiddy, [(0, 0, 0), (255, 255, 0)]],
-    [255, 255, 127, fiddyfiddy, [(255, 255, 255), (255, 255, 0)]],
-    [0, 255, 255, fiddyfiddy, [(255, 255, 255), (0, 0, 255)]],
-    [127, 0, 127, fiddyfiddy, [(255, 0, 0), (0, 0, 255)]],
-    [127, 255, 0, fiddyfiddy, [(255, 255, 0), (0, 255, 0)]],
-    [127, 191, 0, fiddyfiddy, [(255, 128, 0), (0, 255, 0)]],
-    [0x7c, 0xa4, 0x7c, fiddyfiddy, [(255, 255, 255), (0, 255, 0)]],
-    [0xa4, 0x7c, 0x7c, fiddyfiddy, [(255, 255, 255), (255, 0, 0)]],
-    [0x7c, 0x7c, 0xa4, fiddyfiddy, [(255, 255, 255), (0, 0, 255)]],
-    [0xb8, 0x91, 0x81, fiddyfiddy, [(255, 255, 255), (255, 128, 0)]],
-    [0xFF, 0x2C, 0x00, fiddyfiddy, [(255, 0, 0), (255, 128, 0)]],
-    [0xFF, 0x9C, 0x00, fiddyfiddy, [(255, 255, 0), (255, 128, 0)]],
-    [0xAA, 0xD3, 0xDF, fiddyfiddy, [(255,255,255), (0,0,255)]],
-    [0xAD, 0xD1, 0x9E, fiddyfiddy, [(0,255,0),(255,255,255)]],
-    [0xD9, 0xD0, 0xC9, fiddyfiddy, [(0,0,0), (255, 255, 255)]],
-    [0xF2, 0xE9, 0xD7, fiddyfiddy, [(255,255,0),(255,255,255)]],
-    [0xFC, 0xD6, 0xA4, fiddyfiddy, [(255,127,0),(255,255,255)]],
-    [0xCD, 0xEB, 0xB0, threefourth, [(255,255,255),(0,255,0)]],
-    [0xE0, 0xDF, 0xDF, threefourth, [(255,255,255),(0, 0, 0)]],
-    [0xE8, 0x92, 0xA2, fiddyfiddy, [(255,0,0), (255,255,255)]],
+    [127, 127, 0, fiddyfiddy, [BLACK, YELLOW]],
+    [255, 255, 127, fiddyfiddy, [WHITE, YELLOW]],
+    [0, 255, 255, fiddyfiddy, [WHITE, BLUE]],
+    [127, 0, 127, fiddyfiddy, [RED, BLUE]],
+    [127, 255, 0, fiddyfiddy, [YELLOW, GREEN]],
+    [127, 191, 0, fiddyfiddy, [ORANGE, GREEN]],
+    [0x7c, 0xa4, 0x7c, fiddyfiddy, [WHITE, GREEN]],
+    [0xa4, 0x7c, 0x7c, fiddyfiddy, [WHITE, RED]],
+    [0x7c, 0x7c, 0xa4, fiddyfiddy, [WHITE, BLUE]],
+    [0xb8, 0x91, 0x81, fiddyfiddy, [WHITE, ORANGE]],
+    [0xFF, 0x2C, 0x00, fiddyfiddy, [RED, ORANGE]],
+    [0xFF, 0x9C, 0x00, fiddyfiddy, [YELLOW, ORANGE]],
+    [0xAA, 0xD3, 0xDF, fiddyfiddy, [WHITE, BLUE]],
+    [0xAD, 0xD1, 0x9E, fiddyfiddy, [GREEN,WHITE]],
+    [0xD9, 0xD0, 0xC9, fiddyfiddy, [BLACK, WHITE]],
+    [0xF2, 0xE9, 0xD7, fiddyfiddy, [YELLOW,WHITE]],
+    [0xFC, 0xD6, 0xA4, fiddyfiddy, [ORANGE,WHITE]],
+    [0xCD, 0xEB, 0xB0, threefourth, [WHITE,GREEN]],
+    [0xE0, 0xDF, 0xDF, threefourth, [WHITE,BLACK]],
+    [0xE8, 0x92, 0xA2, fiddyfiddy, [RED, WHITE]],
 ]
 
 
 def map_color(pxl, x, y):
 
     deltac = 100000
-    new_pxl = (0, 0, 0)
+    new_pxl = BLACK
 
     for color in palette:
         delta = sqrt(pow(color[0]-pxl[0], 2) +
