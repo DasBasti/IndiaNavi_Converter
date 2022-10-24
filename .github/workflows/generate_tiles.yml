@@ -54,38 +54,8 @@ jobs:
           convert frame.pnm frame.png
 
     - name: Upload screenshot
-      if: success()
-      uses: actions/upload-artifact@v3
+      uses: edunad/actions-image@v1.0.1
       with:
-        name: screenshot.png
-        path: frame.png
-
-    - name: zip tiles
-      run: |
-        cd tiles/lz4 && zip -r lz4.zip . && cd .. && rm -rf lz4 && cd ..
-        cd tiles/png && zip -r png.zip . && cd .. && rm -rf png && cd ..
-        cd tiles && mv raw MAPS && cp ../SD_CARD/* . && zip -r indianavi_sd.zip .  && cd ..
-
-    - name: Upload sd card zip file
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: indianavi_sd.zip
-        path: tiles/indianvi_sd.zip
-        
-    - name: Upload lz4 zip file
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: lz4.zip
-        path: tiles/lz4/lz4.zip
-        retention-days: 5   
-    
-    - name: Upload png zip file
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: png.zip
-        path: tiles/png/png.zip
-        retention-days: 5   
-    
+          path: 'frame.png'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          title: '🚶‍♂️'
