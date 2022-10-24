@@ -44,7 +44,7 @@ def fiddyfiddy(x, y, colors):
     return colors[0]
 
 
-def threeforuth(x, y, colors):
+def threefourth(x, y, colors):
     if x % 4 == 0:
         if y % 4 == 0:
             return colors[1]
@@ -78,12 +78,13 @@ palette = [
     [0xFF, 0x2C, 0x00, fiddyfiddy, [(255, 0, 0), (255, 128, 0)]],
     [0xFF, 0x9C, 0x00, fiddyfiddy, [(255, 255, 0), (255, 128, 0)]],
     [0xAA, 0xD3, 0xDF, fiddyfiddy, [(255,255,255), (0,0,255)]],
-    [0xAD, 0xD1, 0x9E, fiddyfiddy, [(0,255,0),(0,255,0)]],
+    [0xAD, 0xD1, 0x9E, fiddyfiddy, [(0,255,0),(255,255,255)]],
     [0xD9, 0xD0, 0xC9, fiddyfiddy, [(0,0,0), (255, 255, 255)]],
     [0xF2, 0xE9, 0xD7, fiddyfiddy, [(255,255,0),(255,255,255)]],
     [0xFC, 0xD6, 0xA4, fiddyfiddy, [(255,127,0),(255,255,255)]],
-    [0xCD, 0xEB, 0xB0, fiddyfiddy, [(0,255,0),(255,255,255)]],
-    [0xE0, 0xDF, 0xDF, threeforuth, [(255,255,255),(0, 0, 0)]]
+    [0xCD, 0xEB, 0xB0, threefourth, [(255,255,255),(0,255,0)]],
+    [0xE0, 0xDF, 0xDF, threefourth, [(255,255,255),(0, 0, 0)]],
+    [0xE8, 0x92, 0xA2, fiddyfiddy, [(255,0,0), (255,255,255)]],
 ]
 
 
