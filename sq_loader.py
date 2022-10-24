@@ -11,6 +11,6 @@ lon = [gps1[1], gps2[1]]
 
 
 print('Box at ({0},{1}) -> ({2},{3})'.format(lat[0], lon[0], lat[1], lon[1]))
-download.get_map(lon, lat, [16], "job")
+download.get_map(lon, lat, [16], "job", 2)
 print('Check: http://platinenmacher.tech/navi/index.html?lat1={0}&lon1={1}&lat2={2}&lon2={3}'.format(
     lat[0], lon[0], lat[1], lon[1]))
