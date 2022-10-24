@@ -9,16 +9,16 @@ jobs:
   install_pip_and_generate:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: tiles/png
         key: ${{ runner.os }}-tiles-${{ hashFiles('sq_loader.py') }}
@@ -55,7 +55,7 @@ jobs:
 
     - name: Upload screenshot
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: screenshot.png
         path: frame.png
@@ -68,14 +68,14 @@ jobs:
 
     - name: Upload sd card zip file
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: indianavi_sd.zip
         path: tiles/indianvi_sd.zip
         
     - name: Upload lz4 zip file
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: lz4.zip
         path: tiles/lz4/lz4.zip
@@ -83,7 +83,7 @@ jobs:
     
     - name: Upload png zip file
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: png.zip
         path: tiles/png/png.zip
