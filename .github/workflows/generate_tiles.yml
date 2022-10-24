@@ -59,3 +59,5 @@ jobs:
           path: 'frame.png'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           title: '🚶‍♂️'
+          uploadHost: "https://0x0.st/"
+          
