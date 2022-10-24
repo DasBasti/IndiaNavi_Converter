@@ -18,6 +18,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
+    - uses: actions/cache@v2
+      with:
+        path: tiles/png
+        key: ${{ runner.os }}-tiles-${{ hashFiles('sq_loader.py') }}
+        restore-keys: |
+          ${{ runner.os }}-tiles-
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -38,6 +45,7 @@ jobs:
       run: |
           export DISPLAY=:99
           sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 &
+          chmod +x ./inianavi &
           ./indianavi --screenshot
 
     - name: Upload screenshot
