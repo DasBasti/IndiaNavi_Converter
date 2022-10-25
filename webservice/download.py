@@ -27,10 +27,10 @@ def lat2tile(lat, zoom):
     return math.floor(((1 - math.log(math.tan((lat * math.pi) / 180) + 1 / math.cos((lat * math.pi) / 180)) / math.pi) / 2) * math.pow(2, zoom))
 
 
-def get_tiles(lon, lat, zoom):
+def get_tiles(lon, lat, zoom, margin):
     jobs = []
     for z in zoom:
-        jobs.extend(get_jobs_for(lon, lat, z))
+        jobs.extend(get_jobs_for(lon, lat, z, margin))
 
     total = len(jobs)
 
@@ -81,7 +81,7 @@ def process_image(job):
     return("{0} -> {1}".format(url, job.get("img_folder")+job.get("img_file")))
 
 
-def get_jobs_for(lon, lat, zoom):
+def get_jobs_for(lon, lat, zoom, margin):
 
     # generate tile limits for download
     x = [lon2tile(lon[0], zoom), lon2tile(lon[1], zoom)]
@@ -95,10 +95,10 @@ def get_jobs_for(lon, lat, zoom):
         x[1],x[0] = x[0],x[1]
 
     # add tiles to the limits
-    x[1] += 5
-    x[0] -= 5
-    y[1] += 5
-    y[0] -= 5
+    x[1] += margin
+    x[0] -= margin
+    y[1] += margin
+    y[0] -= margin
 
     print(
         'Tiles: ({4}/{0}/{1}.png) -> ({4}/{2}/{3}.png)'.format(x[0], y[0], x[1], y[1], zoom))
@@ -135,6 +135,6 @@ def convert_to_c_file(filename):
     c_file.close()
 
 
-def get_map(lon, lat, zoom, jobfolder):
-    get_tiles(lon, lat, zoom)
+def get_map(lon, lat, zoom, jobfolder, margin):
+    get_tiles(lon, lat, zoom, margin)
     # zip up all the raw files for download

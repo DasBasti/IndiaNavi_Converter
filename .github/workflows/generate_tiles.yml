@@ -1,27 +1,37 @@
 name: Generate IndiaNavi Tiles for SD card 
 on:
-  push:
-    branches: 
-      - '*'
   pull_request:
 
 jobs:
   install_pip_and_generate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - uses: actions/cache@v2
+    - uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
 
+    - uses: actions/cache@v3
+      with:
+        path: tiles/png
+        key: ${{ runner.os }}-tiles-${{ hashFiles('sq_loader.py') }}
+        restore-keys: |
+          ${{ runner.os }}-tiles-
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.10' 
+
+    - name: Setup XServer
+      run: |
+        sudo apt update 
+        sudo apt install xvfb -y
+        sudo apt install imagemagick -y
 
     - name: Install dependencies
       run: |
@@ -34,32 +44,22 @@ jobs:
     - name: Run tile converter
       run: python sq_loader.py
 
-    - name: zip tiles
+    - name: Take screenshot
       run: |
-        cd tiles/lz4 && zip -r lz4.zip . && cd .. && rm -rf lz4 && cd ..
-        cd tiles/png && zip -r png.zip . && cd .. && rm -rf png && cd ..
-        cd tiles && mv raw MAPS && cp ../SD_CARD/* . && zip -r indianavi_sd.zip .  && cd ..
+          chmod +x ./indianavi
+          xvfb-run ./indianavi --screenshot
+          convert frame.pnm frame.png
+          mkdir -p screenshots
+          mv frame.png screenshots/screenshot_${{ github.sha }}.png
 
-    - name: Upload sd card zip file
-      if: success()
-      uses: actions/upload-artifact@v2
+    - name: Upload screenshot to S3
+      uses: jakejarvis/s3-sync-action@master
       with:
-        name: indianavi_sd.zip
-        path: tiles/indianvi_sd.zip
-        
-    - name: Upload lz4 zip file
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: lz4.zip
-        path: tiles/lz4/lz4.zip
-        retention-days: 5   
-    
-    - name: Upload png zip file
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-        name: png.zip
-        path: tiles/png/png.zip
-        retention-days: 5   
-    
+        args: --acl public-read
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        SOURCE_DIR: "screenshots/"
+        DEST_DIR: "screenshots/"
