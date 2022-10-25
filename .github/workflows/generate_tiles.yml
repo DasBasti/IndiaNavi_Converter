@@ -67,14 +67,14 @@ jobs:
         SOURCE_DIR: "screenshots/"
         DEST_DIR: "screenshots/"
 
-      - name: Post comment
-        uses: actions/github-script@v3
-              with:
-                github-token: ${{secrets.GITHUB_TOKEN}}
-                script: |
-                  github.issues.createComment({
-                    issue_number: context.issue.number,
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    body: '![Screenshot](https://indianavi.s3.eu-central-1.amazonaws.com/screenshots/screenshot_${{ github.sha }}.png)'
-                  })
+    - name: Post comment
+      uses: actions/github-script@v3
+            with:
+              github-token: ${{secrets.GITHUB_TOKEN}}
+              script: |
+                github.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: '![Screenshot](https://indianavi.s3.eu-central-1.amazonaws.com/screenshots/screenshot_${{ github.sha }}.png)'
+                })
