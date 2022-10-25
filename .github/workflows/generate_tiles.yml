@@ -1,8 +1,5 @@
 name: Generate IndiaNavi Tiles for SD card 
 on:
-  push:
-    branches: 
-      - '*'
   pull_request:
 
 jobs:
@@ -66,15 +63,3 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         SOURCE_DIR: "screenshots/"
         DEST_DIR: "screenshots/"
-
-    - name: Post comment
-      uses: actions/github-script@v3
-      with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: '![Screenshot](http://d14kkt1uzwasu0.cloudfront.net/screenshots/screenshot_${{ github.sha }}.png)'
-          })
