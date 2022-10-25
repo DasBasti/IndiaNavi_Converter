@@ -53,11 +53,14 @@ jobs:
           xvfb-run ./indianavi --screenshot
           convert frame.pnm frame.png
 
-    - name: Upload screenshot
-      uses: edunad/actions-image@v1.0.1
+    - name: Upload screenshot to S3
+      uses: jakejarvis/s3-sync-action@master
       with:
-          path: 'frame.png'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          title: '🚶‍♂️'
-          uploadHost: "https://0x0.st/"
-          
+        args: --acl public-read --delete
+      env:
+        AWS_S3_BUCKET: ${{ secrets.AWS_PRODUCTION_BUCKET_NAME }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        SOURCE_DIR: "frame.png"
+        DEST_DIR: "screenshot_${{ GITHUB_SHA }}.png"
