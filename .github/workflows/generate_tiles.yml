@@ -63,4 +63,4 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
         AWS_REGION: ${{ secrets.AWS_REGION }}
         SOURCE_DIR: "frame.png"
-        DEST_DIR: "screenshot_$(git describe --abbrev=7 --always).png"
+        DEST_DIR: "screenshot_${{ github.sha }}.png"
