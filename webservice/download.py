@@ -8,7 +8,7 @@ import lz4.frame
 from multiprocessing import Pool
 
 
-url_template = "https://c.tile.openstreetmap.de/{z}/{x}/{y}.png"
+url_template = "https://a.tile.opentopomap.org/{z}/{x}/{y}.png"
 epd = epd5in65f.EPD()
 eink_pal = Image.new("P", (1, 1), 0)
 eink_pal.putpalette(pal.generate_eink())
