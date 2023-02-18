@@ -1,0 +1,21 @@
+[package]
+name = "indianavi_map_color"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+image = "*"
+num-integer = "0.1.45"
+openssl = { version = "=0.10.45", features = ["vendored"] }
+
+[package.metadata.lambda.deploy]
+memory = 512                   # Function's memory
+timeout = 60                   # Function's execution timeout
+tracing = "active"             # Tracing mode
+role = "role-full-arn"         # Function's execution role
+env_file = ".env.production"   # File to load environment variables from
+layers = [                     # List of layers to deploy with your function
+    "layer-full-arn"
+]
