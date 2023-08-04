@@ -1,15 +1,19 @@
 use lambda_http::{run, service_fn, Body, Error, Request, RequestExt, Response};
+use rand::thread_rng;
+use rand::prelude::SliceRandom;
 
+const urls : [&str; 3] = ["https://a.tile.opentopomap.org","https://b.tile.opentopomap.org","https://c.tile.opentopomap.org",]; 
 /// This is the main body for the function.
 /// Write your code inside it.
 /// There are some code example in the following URLs:
 /// - https://github.com/awslabs/aws-lambda-rust-runtime/tree/main/examples
 async fn function_handler(event: Request) -> Result<Response<Body>, Error> {
-    let online_addr = format!("https://c.tile.opentopomap.org{}", event.raw_http_path());
+    let mut rng = thread_rng();
+    let online_addr = format!("{:?}{}", urls.choose(&mut rng), event.raw_http_path());
     let resp = reqwest::get(&online_addr).await?;
 
     let image = indianavi_map_color::convert_image(&resp.bytes().await?)?;
-
+    println!("Get {}", &online_addr);
     Ok(Response::builder()
         .status(200)
         .header("content-type", "application/binary")

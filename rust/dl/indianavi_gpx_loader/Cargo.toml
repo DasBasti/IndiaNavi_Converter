@@ -1,0 +1,10 @@
+[package]
+name = "indianavi_gpx_loader"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+gpx = { git="https://github.com/georust/gpx"}
+unicode-bom = "1.1.4"

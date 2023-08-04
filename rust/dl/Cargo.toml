@@ -1,16 +1,22 @@
 [package]
-name = "dl"
+name = "map_downloader"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-error-chain = "0.12.4"
-tempfile = "3.3.0"
-tokio = { version = "1", features = ["full"] }
-reqwest = "0.11"
-image = "0.24.4"
-num-integer = "0.1.45"
-futures = "*"
-downloader = "0.2.7"
+indicatif = "0.17.3"
+indianavi_map_color = {path = "indianavi_map_color"}
+indianavi_gpx_loader = {path = "indianavi_gpx_loader"}
+reqwest = "0.11.14"
+rand = "0.8.5"
+gpx = { git="https://github.com/georust/gpx"}
+tokio = { version = "1.25.0", features = ["full"] }
+futures = "0.3.26"
+unicode-bom = "1.1.4"
+clap = { version = "4.0", features = ["derive"] }
+format-bytes = "0.1"
+
+[target.'cfg(windows)'.build-dependencies]
+winres = "0.1"
